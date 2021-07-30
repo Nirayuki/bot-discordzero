@@ -1,5 +1,6 @@
 const Discord = require("discord.js");
 const ytdl = require("ytdl-core-discord");
+const cron = require('cron');
 require('dotenv/config');
 
 const client = new Discord.Client();
@@ -21,8 +22,33 @@ const filter = (reaction, user) => {
 };
 
 client.once('ready', () => {
+    client.user.setActivity('Aprendendo');
+    // 
+    
+    console.log(client.members);
     console.log('Iniciado com sucesso!');
 });
+
+const Data = new Date;
+const Horas = Data.getHours();
+const Minutos = Data.getMinutes();
+
+
+
+const scheduledMessage = (props) => {
+    let message = new cron.CronJob('* 2 */2 * * *', () => {
+        client.channels.cache.get("783883817089892393").send(`Está na hora do bump <@&${props.role.id}>`);
+        console.log("tá caindo a cada 10s");
+    })
+
+    if(props.start === true) {
+        message.start()
+        client.channels.cache.get("780665727547736075").send("Schedule iniciado com sucesso!");
+    } else {
+        message.stop()
+        client.channels.cache.get("780665727547736075").send("Schedule parado com sucesso!");
+    }
+}
 
 client.on('message', message => {
     try {
@@ -51,6 +77,38 @@ client.on('message', message => {
 
         if (command === "ping") {
             message.reply("Pong!");
+        }
+
+        if (command === "anderson") {
+            message.reply("Maravilhoso apenas...!");
+        }
+
+        if (command === "time") {
+            message.reply(Minutos);
+            console.log(Minutos);
+        }
+
+        if (command === "teste") {
+            const teste = message.guild.roles.cache.find((role) => role.name === "Moderators");
+            message.reply(teste)
+        }
+
+        if(command === "schedule") {
+            // scheduledMessage(message.guild.roles.cache.find((role) => role.name === "Moderators"));
+            const data = {
+                start: true,
+                role: message.guild.roles.cache.find((role) => role.name === "Bumper")
+            }
+            scheduledMessage(data);
+        }
+
+        if(command === "schedulestop") {
+            // scheduledMessage(message.guild.roles.cache.find((role) => role.name === "Moderators"));
+            const data = {
+                start: false,
+                role: message.guild.roles.cache.find((role) => role.name === "Bumper")
+            }
+            scheduledMessage(data);
         }
 
         if (command === "play") {
